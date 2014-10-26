@@ -30,24 +30,26 @@ namespace CalculatorApp
 
 	public class CalculatorActor : ReceiveActor
 	{
+		private double _answer;
+
 		public CalculatorActor()
 		{
-			var answer = 0d;
-
 			Receive<Add>(add =>
 			{
-				answer = add.Term1 + add.Term2;
-				Sender.Tell(new Answer(answer));
+				_answer = add.Term1 + add.Term2;
+				Sender.Tell(new Answer(_answer));
 			});
 
 			Receive<Subtract>(sub =>
 			{
-				answer = sub.Term1 - sub.Term2;
-				Sender.Tell(new Answer(answer));
+				_answer = sub.Term1 - sub.Term2;
+				Sender.Tell(new Answer(_answer));
 			});
 
-			Receive<GetLastAnswer>(m => Sender.Tell(new Answer(answer)));
+			Receive<GetLastAnswer>(m => Sender.Tell(new Answer(_answer)));
 		}
+
+		public double Answer { get { return _answer; } }
 	}
 
 	public class Add
