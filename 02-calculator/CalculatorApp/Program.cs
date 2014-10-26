@@ -19,6 +19,9 @@ namespace CalculatorApp
 			var answerSubtract = calculator.Ask<Answer>(new Subtract(5, 3)).Result;
 			Console.WriteLine("5 - 3 = " + answerSubtract.Value);
 
+			var lastAnswer = calculator.Ask<Answer>(GetLastAnswer.Instance).Result;
+			Console.WriteLine("Last answer = " + lastAnswer.Value);
+
 
 			Console.WriteLine("Press any key to exit");
 			Console.ReadKey();
@@ -29,8 +32,21 @@ namespace CalculatorApp
 	{
 		public CalculatorActor()
 		{
-			Receive<Add>(add => Sender.Tell(new Answer(add.Term1 + add.Term2)));
-			Receive<Subtract>(add => Sender.Tell(new Answer(add.Term1 - add.Term2)));
+			var answer = 0d;
+
+			Receive<Add>(add =>
+			{
+				answer = add.Term1 + add.Term2;
+				Sender.Tell(new Answer(answer));
+			});
+
+			Receive<Subtract>(sub =>
+			{
+				answer = sub.Term1 - sub.Term2;
+				Sender.Tell(new Answer(answer));
+			});
+
+			Receive<GetLastAnswer>(m => Sender.Tell(new Answer(answer)));
 		}
 	}
 
@@ -74,5 +90,12 @@ namespace CalculatorApp
 		}
 
 		public double Value { get { return _value; } }
+	}
+
+	public class GetLastAnswer
+	{
+		private static readonly GetLastAnswer _instance = new GetLastAnswer();
+		private GetLastAnswer() { }
+		public static GetLastAnswer Instance { get { return _instance; } }
 	}
 }
