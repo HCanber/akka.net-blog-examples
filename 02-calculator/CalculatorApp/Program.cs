@@ -14,7 +14,12 @@ namespace CalculatorApp
 			var system = ActorSystem.Create("calculator-system");
 			var calculator = system.ActorOf<CalculatorActor>("calculator");
 			var answer = calculator.Ask<Answer>(new Add(1, 2)).Result;
-			Console.WriteLine("Answer: " + answer.Value);
+			Console.WriteLine("1 + 2 = " + answer.Value);
+
+			var answerSubtract = calculator.Ask<Answer>(new Subtract(5, 3)).Result;
+			Console.WriteLine("5 - 3 = " + answerSubtract.Value);
+
+
 			Console.WriteLine("Press any key to exit");
 			Console.ReadKey();
 		}
@@ -25,6 +30,7 @@ namespace CalculatorApp
 		public CalculatorActor()
 		{
 			Receive<Add>(add => Sender.Tell(new Answer(add.Term1 + add.Term2)));
+			Receive<Subtract>(add => Sender.Tell(new Answer(add.Term1 - add.Term2)));
 		}
 	}
 
@@ -34,6 +40,21 @@ namespace CalculatorApp
 		private readonly double _term2;
 
 		public Add(double term1, double term2)
+		{
+			_term1 = term1;
+			_term2 = term2;
+		}
+
+		public double Term1 { get { return _term1; } }
+		public double Term2 { get { return _term2; } }
+	}
+
+	public class Subtract
+	{
+		private readonly double _term1;
+		private readonly double _term2;
+
+		public Subtract(double term1, double term2)
 		{
 			_term1 = term1;
 			_term2 = term2;
